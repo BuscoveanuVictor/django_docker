@@ -1,0 +1,5 @@
+env
+temporar-facturi
+migrations
+__pycache__
+*.log

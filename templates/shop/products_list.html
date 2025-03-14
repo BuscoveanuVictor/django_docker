@@ -1,0 +1,99 @@
+{% load static %}
+<div class="products-grid">
+    {% for product in products %}
+    <div class="product-card">
+        <a href="/product/{{ product.instrument_id }}/" class="product-link">
+            <div class="product-image">
+                {% for image in product.images.all %}
+                    {% if image.path %}
+                        <img src="{% static image.path %}" alt="{{ product.name }}">
+                    {% endif %}
+                {% endfor %}
+            </div>
+            
+            <div class="product-info">
+                <h3>{{ product.name }}</h3>
+                <p class="price">{{ product.price }} lei</p>
+                <p class="stock-info">În stoc: {{ product.stock }}</p>
+            </div>
+        </a>
+
+        <div class="product-actions">
+            <span id="cart-status-{{ product.instrument_id }}" style="display: none;">
+                Adaugat in cos
+            </span>
+            <br>
+            <div class="quantity-controls" data-product-id="{{ product.instrument_id }}">
+                <button class="btn-decrease">-</button>
+                <input type="number" 
+                        class="quantity-input" 
+                        value="1"
+                        min="1" 
+                        max="{{ product.stock }}"
+                >
+                <button class="btn-increase">+</button>
+            </div>    
+            <button class="btn-add-to-cart" data-product-id="{{ product.instrument_id }}">
+                <i class="fas fa-shopping-cart"></i>
+                Adauga in cos
+            </button>
+            
+            {% if product.stock <= 0 %}
+                <span class="out-of-stock">Stoc epuizat</span>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <div class="no-products">
+        <p>Nu exista produse disponibile momentan.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+
+    document.getElementById('filterForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+      
+        const filters = {
+            model: document.getElementById('id_model').value,
+            min_price: document.getElementById('id_min_price').value,
+            max_price: document.getElementById('id_max_price').value,
+            category: document.getElementById('id_category').value,
+            type: document.getElementById('id_type').value,
+            min_rating: document.getElementById('id_min_rating').value,
+            sort: document.getElementById('id_sort').value
+        };
+        
+        const queryParams = [];
+        // Iteram prin toate perechile cheie-valoare din obiectul filters
+        for (const [key, value] of Object.entries(filters)) {
+            if (value) { 
+                queryParams.push(`${key}=${encodeURIComponent(value)}`);
+            }
+        }
+
+        // Creez interogarea de tip get pentru a filtra produsele
+        const queryString = queryParams.join('&');
+        const url = queryString ? `?${queryString}` : '';
+    
+        console.log(url);
+    
+        fetch(`${url}`, {
+            method: "GET",
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.html);
+            document.getElementById('productsGrid').innerHTML = data.html;
+            history.pushState({}, '', `?${queryString}`);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+</script>
+    

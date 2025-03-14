@@ -1,0 +1,12 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/register.css' %}">
+
+<div class="container mt-4">
+    <h2>Înregistrare</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Înregistrare</button>
+    </form>
+</div>

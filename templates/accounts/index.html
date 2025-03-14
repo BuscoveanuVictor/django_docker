@@ -1,0 +1,43 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/account.css' %}">
+
+<div class="welcome-container">
+    <div class="container">
+        <h1 class="text-center title">Bine ați venit pe platforma noastră!</h1>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="btn-container">
+                    {% if not user.is_authenticated %}
+                        <div class="d-grid gap-3">
+                            <a href="{% url 'register' %}" class="btn custom-btn btn-register btn-animate">
+                                <i class="fas fa-user-plus me-2"></i>Înregistrare
+                            </a>
+                            
+                            <a href="{% url 'login' %}" class="btn custom-btn btn-login btn-animate">
+                                <i class="fas fa-sign-in-alt me-2"></i>Autentificare
+                            </a>
+                        </div>
+                    {% endif %}
+
+                    {% if user.is_authenticated %}
+                        <div class="d-grid gap-3">
+                            <a href="{% url 'profile' %}" class="btn custom-btn btn-profile btn-animate">
+                                <i class="fas fa-user me-2"></i>Profilul meu
+                            </a>
+
+                            <a href="{% url 'password_change' %}" class="btn custom-btn btn-password btn-animate">
+                                <i class="fas fa-key me-2"></i>Schimbă parola
+                            </a>
+
+                            <a href="{% url 'logout' %}" class="btn custom-btn btn-logout btn-animate">
+                                <i class="fas fa-sign-out-alt me-2"></i>Deconectare
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

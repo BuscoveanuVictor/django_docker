@@ -1,0 +1,88 @@
+{% load static %}
+
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="{% static 'css/index.css' %}">
+    </head>
+
+    <body>
+        <div class="welcome-banner">
+            <h1>Bun venit la Musicman 👋</h1>
+        </div>
+
+        <nav class="top-nav">
+            <div class="nav-left">
+                <a href="/contact/">Contactați-ne</a>
+            </div>
+            <div class="nav-right">
+                <span>transport gratuit de la 900 lei</span>
+                <span>Returnarea Banilor în 30 de Zile</span>
+            </div>
+        </nav>
+
+        <header class="main-header">
+            <div class="header-left">
+                <button class="menu-toggle">☰</button>
+                <a href="/" class="logo">Musicman</a>
+            </div>
+            
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Caută">
+                <button type="submit">🔍</button>
+                <script>
+
+                    // Script pentru bara de cautare daca se da enter sau se apasa pe lupa
+                    document.querySelector('.search-bar input').addEventListener('keyup', function(e) {
+                        console.log("enter")
+                        if (e.key === 'Enter') {
+                            window.location.href = `/shop/?model=${e.target.value}`;
+                        }
+                    });
+                    document.querySelector('.search-bar button').addEventListener('click', function(e) {
+                        window.location.href = `/shop/?model=${document.getElementById('search-input').value}`;
+                    });
+                </script>
+            </div>
+            
+            <div class="header-right">
+                <a href="/account/" class="account-link">
+                    <br>
+                    🙍🏻‍♂️Cont
+                </a>
+                <a href="/wishlist/" class="wishlist-link">
+                    <i class="fas fa-heart"></i>
+                </a>
+                <a href="/cart/" class="cart-link">
+                    <span class="cart-count">0</span>
+                    🛒
+                </a>
+            </div>
+        </header>
+
+        <section class="categories">
+            <h2>Categoriile noastre</h2>
+            <div class="categories-grid">
+                <div class="category-card">
+                    <a href="/shop/?category=Chitara">
+                        <img src="{% static 'images/chitara.jpg' %}" alt="Chitare și Basuri">
+                        <h3>Chitare si Basuri</h3>
+                    </a>
+                </div>
+
+                <div class="category-card">
+                    <a href="/shop/?category=Tobe">
+                        <img src="{% static 'images/tobe.jpg' %}" alt="Tobe și Percuție">
+                        <h3>Tobe si Percutie</h3>
+                    </a>
+                </div>
+
+                <div class="category-card">
+                    <a href="/shop/?category=Pian">
+                        <img src="{% static 'images/pian.jpg' %}" alt="Claviaturi">
+                        <h3>Claviaturi</h3>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </body>
+</html>

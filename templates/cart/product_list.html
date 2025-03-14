@@ -1,0 +1,143 @@
+
+<div class="cart-container">
+    <div class="sort-controls">
+        <button onclick="sortItems('name')">Sortează după nume</button>
+        <button onclick="sortItems('price')">Sortează după preț</button>
+    </div>
+
+    <div class="cart-items">
+    </div>
+
+    <div class="cart-summary">
+      
+    </div>
+    
+</div>
+
+<script>
+
+// Incarcam cosul cand pagina se incarca
+document.addEventListener('DOMContentLoaded', loadCartFromLocalStorage);
+
+function loadCartFromLocalStorage() {
+    const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+    console.log('Cart items:', cartItems);
+    const container = document.querySelector('.cart-items');
+    container.innerHTML = ''; 
+    
+    let totalPrice = 0;
+    let totalItems = 0;
+
+    cartItems.forEach(item => {
+        if(item != null){
+            // Convertim id in instrument_id daca exista
+            if (item.id && !item.instrument_id) {
+                item.instrument_id = item.id;
+                delete item.id;
+            }
+            
+            totalItems += item.quantity;
+            const itemTotal = item.price * item.quantity;
+            totalPrice += itemTotal;
+
+            const itemHTML = `
+            <div class="cart-item" data-price="${itemTotal}" data-name="${item.name}">
+                <div class="cart-item-header">
+                    <h3>${item.name}</h3>
+                    <button class="remove-item" onclick="removeFromCart('${item.name}')">✕</button>
+                </div>
+                <p>Preț unitar: ${item.price} lei</p>
+                <p>Cantitate: ${item.quantity}</p>
+                <p>Total: ${itemTotal} lei</p>
+            </div>
+        `;
+        container.innerHTML += itemHTML;
+        }
+    });
+
+    // Salvam inapoi in localStorage cu structura corectata
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+
+    document.querySelector('.cart-summary').innerHTML = `
+        <p>Total produse: ${totalItems}</p>
+        <p>Pret total: ${totalPrice} lei</p>
+        <button onclick="procesOrder()" class="buy-button">Cumpara</button>
+    `;
+}
+
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    return parts.pop().split(';').shift();
+}
+
+   
+function sortItems(criteria) {
+    const container = document.querySelector('.cart-items');
+    const items = Array.from(container.getElementsByClassName('cart-item'));
+    
+    items.sort((a, b) => {
+        if (criteria === 'name') {
+            const nameA = a.dataset.name.toLowerCase();
+            const nameB = b.dataset.name.toLowerCase();
+            return nameA.localeCompare(nameB);
+        } else if (criteria === 'price') {
+            const priceA = parseFloat(a.dataset.price);
+            const priceB = parseFloat(b.dataset.price);
+            return priceA - priceB;
+        }
+    });
+    
+    // Golim containerul și readăugăm elementele sortate
+    container.innerHTML = '';
+    items.forEach(item => container.appendChild(item));
+}
+
+function removeFromCart(productName) {
+    let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+    cartItems = cartItems.filter(item => item && item.name !== productName);
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+    loadCartFromLocalStorage(); // Reîncărcăm coșul pentru a actualiza afișarea
+}
+
+    
+function procesOrder() {
+    let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+    
+    if (cartItems.length === 0) {
+        alert('Cosul este gol!');
+        return;
+    }
+
+    cartItems = cartItems.filter(item => item !== null);
+
+    console.log('Cart items before sending:', cartItems);
+    
+    fetch('/cart/process-order/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(cartItems)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Server response:', data);
+        if (data.success) {
+            localStorage.removeItem('cart');
+            loadCartFromLocalStorage();
+            alert('Comanda a fost procesata cu succes! Vei primi factura pe email.');
+        } else {
+            alert('A aparut o eroare: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error details:', error);
+        alert('A aparut o eroare la procesarea comenzii.');
+    });
+}
+
+ 
+
+</script>

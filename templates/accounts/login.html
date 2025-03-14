@@ -1,0 +1,34 @@
+{% load static %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="text-center mb-4">Autentificare</h2>
+            {% if messages %}
+                <div class="alert alert-danger">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                    {{ form.username }}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form.password }}
+                </div>
+                <div class="form-check mb-3">
+                    {{ form.remember_me }}
+                    <label class="form-check-label" for="{{ form.remember_me.id_for_label }}">
+                        Tine-ma minte
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Autentificare</button>
+            </form>
+        </div>
+    </div>
+</div>
